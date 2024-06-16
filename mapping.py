@@ -22,22 +22,22 @@ class CatParams:
     column_heights: [int]
 
     @cached_property
-    def led_count(self):
+    def led_count(self) -> int:
         return sum(self.column_heights)
 
     @cached_property
-    def grid_size(self):
+    def grid_size(self) -> GridSize:
         return GridSize(
             width=len(self.column_heights),
             height=max(self.column_heights))
 
     @cached_property
-    def padding_lengths(self):
+    def padding_lengths(self) -> [(int, int)]:
         padding = [self.grid_size.height - col_height for col_height in self.column_heights]
         return padding
 
 
-def basic_padding(padding_lengths : [int]):
+def basic_padding(padding_lengths: [int]):
     return [(0, length) for length in padding_lengths]
 
 
@@ -86,7 +86,7 @@ class PaddedCat:
             return start + coord.row
         return -1
 
-    def mapping(self):
+    def mapping(self) -> [int]:
         return [
             self.led(Coord(col=col, row=row))
             for col in range(self.params.grid_size.width)
