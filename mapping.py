@@ -9,6 +9,9 @@ import os
 import sys
 
 
+FLIPPED_REGIONS = {'left-eye', 'right-ear'}
+
+
 @dataclass
 class GridSize:
     width: int
@@ -36,7 +39,7 @@ class FilledMapping:
 class Mapping:
     map: [int]
 
-    def fill(self, grid_size : GridSize) -> FilledMapping:
+    def fill(self, grid_size: GridSize) -> FilledMapping:
         grid_length = grid_size.width * grid_size.height
         assert len(self.map) == grid_length
         next_unfilled = max(self.map) + 1
@@ -193,7 +196,7 @@ class PaddedCat:
         assert None not in new_map
         return new_map
 
-    SAFETY_BUFFER = 600
+    SAFETY_BUFFER = 0
 
     def region_mapping_1d(self) -> MappingWithRegions1D:
         all_leds = set(range(self.params.led_count))
@@ -221,11 +224,14 @@ class PaddedCat:
         total = len(map)
         region_bounds_by_name = []
         for id, leds in reversed(region_leds_by_id.items()):
+            region = self.params.region_1d_by_id(id)
             start = total
-            map.extend(sorted(leds))
+            leds = sorted(leds)
+            if region.name_or_id in FLIPPED_REGIONS:
+                leds.reverse()
+            map.extend(leds)
             total += len(leds)
             end = total
-            region = self.params.region_1d_by_id(id)
             region_bounds_by_name.append((region.name_or_id, (start, end)))
         map.extend(sorted(all_leds)[split_main_segment_at:])
         return MappingWithRegions1D(map=map, region_bounds_by_name=dict(reversed(region_bounds_by_name)))

@@ -71,9 +71,18 @@ def presets_with_defaults(additional_presets_by_id):
     return presets
 
 
+SYMMETRIC_SEGMENTS = {'left-ear': 'right-ear', 'left-eye': 'right-eye'}
+
 def cat_preset(region_mapping_1d, *, led_map: int):
     cat_segments = [segment(id=0, start=0, stop=len(region_mapping_1d.map), name="background")]
     for id, (name, (start, stop)) in enumerate(region_mapping_1d.region_bounds_by_name.items(), start=1):
         cat_segments.append(segment(id=id, start=start, stop=stop, name=name))
+    def find_segment(name):
+        for segment in cat_segments:
+            if segment['name'] == name:
+                return segment
+        raise IndexError(name)
+    for src, dst in SYMMETRIC_SEGMENTS.items():
+        find_segment(dst)['col'] = find_segment(src)['col']
     cat_preset = preset('cat', cat_segments, led_map=2)
     return cat_preset
