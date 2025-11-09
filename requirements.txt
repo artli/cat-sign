@@ -1,2 +1,4 @@
 wled>=0.18.0
 requests
+zeroconf
+pyfzf
